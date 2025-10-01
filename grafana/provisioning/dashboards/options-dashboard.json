@@ -1,0 +1,25 @@
+{
+  "dashboard": {
+    "title": "Options Demo",
+    "panels": [
+      {
+        "type": "timeseries",
+        "title": "Requests per endpoint",
+        "targets": [
+          { 
+            # Prometheus PromQL Abfrage: Summiert die Rate der HTTP-Anfragen pro Endpunkt über die letzten 1 Minute
+            "expr": "sum by(endpoint) (rate(http_requests_total[1m]))",
+            # Wichtig: Die Datenquelle muss später in Grafana auf Prometheus gesetzt werden
+            "datasource": "Prometheus" 
+          }
+        ],
+        "gridPos": { "x": 0, "y": 0, "w": 24, "h": 9 }
+      }
+    ],
+    "schemaVersion": 27,
+    "version": 1
+  },
+  # Sorgt dafür, dass dieses Dashboard automatisch geladen wird und bestehende Versionen überschreibt
+  "overwrite": true
+}
+

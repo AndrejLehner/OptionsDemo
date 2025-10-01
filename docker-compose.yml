@@ -1,0 +1,60 @@
+services:
+  redpanda:
+    image: redpandadata/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr=internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr=internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr=internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr=redpanda:33145
+      - --advertise-rpc-addr=redpanda:33145
+      - --mode=dev-container
+      - --smp=1
+    ports:
+      - "19092:19092"
+      - "18081:18081"
+      - "18082:18082"
+
+  app:
+    build: ./app
+    environment:
+      REDPANDA: redpanda:9092
+    depends_on:
+      - redpanda
+    ports:
+      - "5000:5000"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:2.8.2
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:2.8.2
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml

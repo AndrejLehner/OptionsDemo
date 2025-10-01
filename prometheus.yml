@@ -1,0 +1,11 @@
+global:
+  # Metriken werden alle 5 Sekunden abgefragt
+  scrape_interval: 5s
+
+# Konfiguration der zu überwachenden Jobs
+scrape_configs:
+  - job_name: 'options-app'
+    # Die Flask App wird über ihren Docker-Servicenamen ('app') auf Port 5000 erreicht
+    static_configs:
+      - targets: ['app:5000']
+
