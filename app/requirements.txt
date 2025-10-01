@@ -1,3 +1,6 @@
 flask
 confluent-kafka
 prometheus-client
+numpy
+scipy
+pandas
