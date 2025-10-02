@@ -1,0 +1,28 @@
+replicaCount:
+  app: 1
+  redpanda: 1
+
+image:
+  app:
+    repository: gcr.io/bms-interview-demo/options-demo-app
+    tag: latest
+    pullPolicy: Always
+
+resources:
+  app:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "400m"
+  redpanda:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "400m"
+
+service:
+  type: LoadBalancer
