@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: options-demo-app
+spec:
+  replicas: {{ .Values.replicaCount.app }}
+  selector:
+    matchLabels:
+      app: options-demo-app
+  template:
+    metadata:
+      labels:
+        app: options-demo-app
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.image.app.repository }}:{{ .Values.image.app.tag }}"
+        imagePullPolicy: {{ .Values.image.app.pullPolicy }}
+        ports:
+        - containerPort: 5000
+        env:
+        - name: REDPANDA
+          value: "options-demo-redpanda:9092"
+        resources:
+          {{- toYaml .Values.resources.app | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: options-demo-app
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: options-demo-app

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: options-demo-redpanda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: options-demo-redpanda
+  template:
+    metadata:
+      labels:
+        app: options-demo-redpanda
+    spec:
+      containers:
+      - name: redpanda
+        image: redpandadata/redpanda:latest
+        command:
+        - redpanda
+        - start
+        - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+        - --advertise-kafka-addr=internal://options-demo-redpanda:9092,external://localhost:19092
+        - --smp=1
+        ports:
+        - containerPort: 9092
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: options-demo-redpanda
+spec:
+  clusterIP: None
+  ports:
+  - port: 9092
+  selector:
+    app: options-demo-redpanda
